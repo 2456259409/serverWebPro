@@ -8,9 +8,8 @@ import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
-//@TableName("rj_paper")
+@TableName("rj_paper")
 @Data
 public class Paper {
     @TableId(value = "id",type = IdType.AUTO)
@@ -18,6 +17,7 @@ public class Paper {
     private String title;
     private Date createTime;
     private Long userId;
+    @TableField(exist = false)
     private List<Question> question;
 
 }

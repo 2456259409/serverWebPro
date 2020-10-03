@@ -1,5 +1,8 @@
 package com.renjian.model;
 
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,9 +10,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Set;
 
-//@TableName("rj_question")
+@TableName("rj_question")
 @Data
 public class Question {
     @TableId(value = "id",type = IdType.AUTO)
@@ -20,6 +22,11 @@ public class Question {
     private Integer code;
 
     private String allAnswer;
+    @TableField(exist = false)
     private List<Answer> answer;
+
+    public void answerToString(){
+        allAnswer= JSONUtil.toJsonStr(answer);
+    }
 
 }
