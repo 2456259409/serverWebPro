@@ -17,6 +17,7 @@ public class Paper {
     private String title;
     private Date createTime;
     private Long userId;
+    private String createUsername;
     @TableField(exist = false)
     private List<Question> question;
 
