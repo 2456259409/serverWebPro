@@ -1,14 +1,17 @@
 package com.renjian.controller;
 
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.renjian.mapper.PaperMapper;
+import com.renjian.model.Answer;
 import com.renjian.model.Paper;
 import com.renjian.model.Question;
 import com.renjian.service.PaperService;
 import com.renjian.service.QuestionService;
 import com.renjian.utils.CommonResult;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -53,6 +56,21 @@ public class PaperController {
         wrapper.in("status",1,2);
         List<Paper> papers = paperService.list(wrapper);
         return new CommonResult().success(papers);
+    }
+
+    @GetMapping("/getById/{id}")
+    public Object getPaperById(@PathVariable Long id){
+        QueryWrapper<Paper> wrapper=new QueryWrapper<>();
+        wrapper.eq("id",id);
+        Paper paper = paperService.getOne(wrapper);
+        List<Question> questions = questionService.list(new QueryWrapper<Question>().eq("paper_id", id));
+        for(Question q:questions){
+//            JSONUtil.isJsonArray(q.getAllAnswer());
+            List<Answer> answers = JSONUtil.parseArray(q.getAllAnswer()).toList(Answer.class);
+            q.setAnswer(answers);
+        }
+        paper.setQuestion(questions);
+        return new CommonResult().success(paper);
     }
 
     @GetMapping("/deletePaper/{id}")
