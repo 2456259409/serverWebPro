@@ -21,6 +21,8 @@ public class Question {
     private String type;
     private Integer code;
 
+    private String textarea;
+
     private String allAnswer;
     @TableField(exist = false)
     private List<Answer> answer;
