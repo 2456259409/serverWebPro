@@ -1,7 +1,5 @@
 package com.renjian.controller;
 
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -83,5 +81,22 @@ public class PaperController {
             return  new CommonResult().success("删除成功");
         }
         return  new CommonResult().failed("删除失败");
+    }
+
+    @PostMapping("/updatePaper")
+    public Object updatePaper(@RequestBody JSONObject jsonObject){
+        Paper paper=JSONUtil.toBean(jsonObject,Paper.class);
+        try{
+            paperService.updateById(paper);
+            for(Question question:paper.getQuestion()){
+                question.setAllAnswer(JSONUtil.toJsonStr(question.getAnswer()));
+            }
+            questionService.updateBatchById(paper.getQuestion());
+            return new CommonResult().success("修改成功");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return new CommonResult().failed("修改失败");
     }
 }
