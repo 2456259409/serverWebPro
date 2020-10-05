@@ -2,7 +2,6 @@ package com.renjian.controller;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.renjian.model.KeyWord;
 import com.renjian.model.User;
