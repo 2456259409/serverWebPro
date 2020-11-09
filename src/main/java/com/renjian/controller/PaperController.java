@@ -65,7 +65,6 @@ public class PaperController {
         Paper paper = paperService.getOne(wrapper);
         List<Question> questions = questionService.list(new QueryWrapper<Question>().eq("paper_id", id).orderByAsc("sort_in_paper"));
         for(Question q:questions){
-//            JSONUtil.isJsonArray(q.getAllAnswer());
             List<Answer> answers = JSONUtil.parseArray(q.getAllAnswer()).toList(Answer.class);
             q.setAnswer(answers);
         }
