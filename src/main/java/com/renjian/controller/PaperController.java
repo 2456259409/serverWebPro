@@ -37,7 +37,9 @@ public class PaperController {
         paper.setCreateTime(new Date());
         paper.setStatus(2);
         paperService.save(paper);
+        int i=1;
         for (Question question:paper.getQuestion()){
+            question.setSortInPaper(i++);
             question.setPaperId(paper.getId());
             question.answerToString();
         }
@@ -61,7 +63,7 @@ public class PaperController {
         QueryWrapper<Paper> wrapper=new QueryWrapper<>();
         wrapper.eq("id",id);
         Paper paper = paperService.getOne(wrapper);
-        List<Question> questions = questionService.list(new QueryWrapper<Question>().eq("paper_id", id));
+        List<Question> questions = questionService.list(new QueryWrapper<Question>().eq("paper_id", id).orderByAsc("sort_in_paper"));
         for(Question q:questions){
 //            JSONUtil.isJsonArray(q.getAllAnswer());
             List<Answer> answers = JSONUtil.parseArray(q.getAllAnswer()).toList(Answer.class);
@@ -88,10 +90,13 @@ public class PaperController {
         Paper paper=JSONUtil.toBean(jsonObject,Paper.class);
         try{
             paperService.updateById(paper);
+            int i=1;
             for(Question question:paper.getQuestion()){
+                question.setSortInPaper(i++);
                 question.setAllAnswer(JSONUtil.toJsonStr(question.getAnswer()));
             }
-            questionService.updateBatchById(paper.getQuestion());
+            questionService.saveOrUpdateBatch(paper.getQuestion());
+//            questionService.updateBatchById(paper.getQuestion());
             return new CommonResult().success("修改成功");
         }catch (Exception e){
             e.printStackTrace();

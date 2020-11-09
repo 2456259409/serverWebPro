@@ -1,7 +1,5 @@
 package com.renjian.model;
 
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -26,6 +24,8 @@ public class Question {
     private String allAnswer;
     @TableField(exist = false)
     private List<Answer> answer;
+
+    private int sortInPaper;//在问卷之中的顺序
 
     public void answerToString(){
         allAnswer= JSONUtil.toJsonStr(answer);
