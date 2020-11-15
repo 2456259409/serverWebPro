@@ -58,7 +58,9 @@ public class BookController {
     @GetMapping("/get_books")
     public Object getBooks(int keyword,Long userId,int pageNum,int pageSize){
         QueryWrapper<Book> wrapper=new QueryWrapper<>();
-        wrapper.eq("creator_id",userId);
+        if(userId!=10){
+            wrapper.eq("creator_id",userId);
+        }
         if(keyword==1){
             wrapper.in("status",1,2);
         }else if(keyword==2){
