@@ -27,4 +27,6 @@ public class Paper {
     @TableField(exist = false)
     private List<Question> question;
 
+    private String creatorName;
+
 }

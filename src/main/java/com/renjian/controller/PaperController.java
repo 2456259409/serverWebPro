@@ -58,6 +58,21 @@ public class PaperController {
         return new CommonResult().success(papers);
     }
 
+    @GetMapping("/get_papers")
+    public Object getPapers(int pageSize,int pageNum){
+        QueryWrapper<Paper> wrapper=new QueryWrapper<Paper>().eq("status",2);
+        StringBuilder sb=new StringBuilder();
+        sb.append("limit ");
+        sb.append(pageNum*pageSize);
+        sb.append(",");
+        sb.append((pageNum+1)*pageSize);
+        wrapper.orderByDesc("create_time");
+        wrapper.last(sb.toString());
+        List<Paper> list = paperService.list(wrapper);
+        return new CommonResult().success(list);
+    }
+
+
     @GetMapping("/getById/{id}")
     public Object getPaperById(@PathVariable Long id){
         QueryWrapper<Paper> wrapper=new QueryWrapper<>();

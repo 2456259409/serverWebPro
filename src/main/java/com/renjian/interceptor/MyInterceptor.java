@@ -21,23 +21,43 @@ public class MyInterceptor implements HandlerInterceptor {
             return true;
         }else{
             String token = request.getHeader("token");
-            if(token!=null&&!"".equals(token)){
-                try{
-                    String[] params=token.split("<->");
-                    Long userId=Long.valueOf(params[0]);
-                    String salt=params[1];
-                    User user = userService.getById(userId);
-                    if(salt.equals(user.getSalt())){
-                        return true;
-                    }else{
+            String type = request.getHeader("type");
+            if("back-end".equals(type)){
+                if(token!=null&&!"".equals(token)){
+                    try{
+                        String[] params=token.split("<->");
+                        Long userId=Long.valueOf(params[0]);
+                        String salt=params[1];
+                        User user = userService.getById(userId);
+                        if(salt.equals(user.getSalt())){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                    }catch (Exception e){
                         return false;
                     }
-                }catch (Exception e){
+                }else{
                     return false;
                 }
-            }else{
+            }
+
+            if("client".equals(type)){
+                if(token!=null&&!"".equals(token)){
+                    try{
+                        String[] params=token.split("<->");
+                        Long userId=Long.valueOf(params[0]);
+                        if(userId==16){
+                            return true;
+                        }
+                    }catch (Exception e){
+                        return false;
+                    }
+                }
                 return false;
             }
+            return false;
+
         }
 
     }
