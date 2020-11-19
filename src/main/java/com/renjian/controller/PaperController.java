@@ -10,6 +10,7 @@ import com.renjian.model.Question;
 import com.renjian.service.PaperService;
 import com.renjian.service.QuestionService;
 import com.renjian.utils.CommonResult;
+import com.renjian.utils.RUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -61,13 +62,9 @@ public class PaperController {
     @GetMapping("/get_papers")
     public Object getPapers(int pageSize,int pageNum){
         QueryWrapper<Paper> wrapper=new QueryWrapper<Paper>().eq("status",2);
-        StringBuilder sb=new StringBuilder();
-        sb.append("limit ");
-        sb.append(pageNum*pageSize);
-        sb.append(",");
-        sb.append((pageNum+1)*pageSize);
+        String limit= RUtil.limitStr(pageSize,pageNum);
         wrapper.orderByDesc("create_time");
-        wrapper.last(sb.toString());
+        wrapper.last(limit);
         List<Paper> list = paperService.list(wrapper);
         return new CommonResult().success(list);
     }
