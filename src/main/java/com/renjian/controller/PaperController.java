@@ -7,6 +7,8 @@ import com.renjian.mapper.PaperMapper;
 import com.renjian.model.Answer;
 import com.renjian.model.Paper;
 import com.renjian.model.Question;
+import com.renjian.model.params.SubmitPaper;
+import com.renjian.service.AnswerService;
 import com.renjian.service.PaperService;
 import com.renjian.service.QuestionService;
 import com.renjian.utils.CommonResult;
@@ -30,6 +32,9 @@ public class PaperController {
 
     @Resource
     private PaperMapper paperMapper;
+
+    @Resource
+    private AnswerService answerService;
 
 
     @PostMapping("/addPaper")
@@ -114,5 +119,14 @@ public class PaperController {
         }
 
         return new CommonResult().failed("修改失败");
+    }
+
+    @PostMapping("/submit_paper")
+    public Object submitPaper(@RequestBody List<SubmitPaper> submit){
+//        for (SubmitPaper paper : submit) {
+//            paper.toCodesJson();
+//        }
+        answerService.saveOrUpdateBatch(submit);
+        return new CommonResult().success();
     }
 }

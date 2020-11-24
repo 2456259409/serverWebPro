@@ -6,6 +6,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.renjian.mapper.BookMapper;
 import com.renjian.model.Book;
+import com.renjian.model.params.SubmitPaper;
 import com.renjian.service.BookService;
 import com.renjian.utils.CommonResult;
 import org.springframework.web.bind.annotation.*;
