@@ -65,8 +65,9 @@ public class PaperController {
     }
 
     @GetMapping("/get_papers")
-    public Object getPapers(int pageSize,int pageNum){
+    public Object getPapers(int pageSize,int pageNum,String keyword){
         QueryWrapper<Paper> wrapper=new QueryWrapper<Paper>().eq("status",2);
+        wrapper.like(keyword!=null&&!"".equals(keyword),"title",keyword);
         String limit= RUtil.limitStr(pageSize,pageNum);
         wrapper.orderByDesc("create_time");
         wrapper.last(limit);

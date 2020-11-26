@@ -20,6 +20,7 @@ public class Book {
     private Integer count;
     private String bookName;
     private Date createTime;
+    private String icon;
     /**
      * 0已经被删除；1待审核；2审核通过
      */

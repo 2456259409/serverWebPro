@@ -9,6 +9,7 @@ import com.renjian.model.Book;
 import com.renjian.model.params.SubmitPaper;
 import com.renjian.service.BookService;
 import com.renjian.utils.CommonResult;
+import com.renjian.utils.RUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -76,6 +77,17 @@ public class BookController {
         sb.append(",");
         sb.append((pageNum+1)*pageSize);
         wrapper.last(sb.toString());
+        List<Book> list = bookService.list(wrapper);
+        return new CommonResult().success(list);
+    }
+
+    @GetMapping("/get_client_books")
+    public Object getBooks(int pageNum,int pageSize,String keyword){
+        QueryWrapper<Book> wrapper=new QueryWrapper<>();
+        wrapper.eq("status",2);
+        wrapper.like(keyword!=null&&!"".equals(keyword),"book_name",keyword);
+        String s = RUtil.limitStr(pageSize, pageNum);
+        wrapper.last(s);
         List<Book> list = bookService.list(wrapper);
         return new CommonResult().success(list);
     }
