@@ -41,6 +41,9 @@ public class Book {
 
     private Date deadline;
 
+    @TableField(exist = false)
+    private User creator;
+
     public void setDeadLineTime(){
         deadline= DateUtil.parse(deadDay+" "+deadTime);
     }

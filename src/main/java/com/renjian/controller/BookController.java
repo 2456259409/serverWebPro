@@ -6,8 +6,10 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.renjian.mapper.BookMapper;
 import com.renjian.model.Book;
+import com.renjian.model.User;
 import com.renjian.model.params.SubmitPaper;
 import com.renjian.service.BookService;
+import com.renjian.service.UserService;
 import com.renjian.utils.CommonResult;
 import com.renjian.utils.RUtil;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,9 @@ public class BookController {
 
     @Resource
     BookMapper bookMapper;
+
+    @Resource
+    UserService userService;
 
     @GetMapping("/get_all")
     public Object getAllBook(){
@@ -79,6 +84,20 @@ public class BookController {
         wrapper.last(sb.toString());
         List<Book> list = bookService.list(wrapper);
         return new CommonResult().success(list);
+    }
+
+    @GetMapping("/get_one_book/{id}")
+    public Object getOneBook(@PathVariable Long id){
+        Book book = bookService.getOne(new QueryWrapper<Book>().eq("id", id));
+        if(book==null){
+            return new CommonResult().failed("您查找的书籍不存在");
+        }
+//        if(book.getCreatorId()!=null){
+//            User user = userService.getOne(new QueryWrapper<User>().eq("id", id));
+//            user.setPassword("");
+//            book.setCreator(user);
+//        }
+        return new CommonResult().success(book);
     }
 
     @GetMapping("/get_client_books")
