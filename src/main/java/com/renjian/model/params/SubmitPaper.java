@@ -15,6 +15,8 @@ public class SubmitPaper {
     private Long id;
     private Long questionId;
 
+    private Long paperId;
+
     private Long userId;
     private String name;
     private Integer type;
