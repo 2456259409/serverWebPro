@@ -26,6 +26,8 @@ public class ClientUser {
 
     private String salt;
 
+    private Integer borrowCount;
+
 //    private String MD5Password(){
 //        SecureUtil.des();
 //        return
