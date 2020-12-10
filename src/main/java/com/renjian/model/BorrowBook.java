@@ -16,9 +16,9 @@ public class BorrowBook {
     @TableId(type = IdType.AUTO,value = "id")
     private Long id;
 
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm")
+//    @DateTimeFormat(pattern = "yy-MM-dd HH:mm")
     private Timestamp returnTime;
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm")
+//    @DateTimeFormat(pattern = "yy-MM-dd HH:mm")
     private Timestamp borrowTime;
     private Long userId;
 
@@ -28,6 +28,9 @@ public class BorrowBook {
 
     //状态 0借阅状态 1正常归还（规定时间期内）2超时归还 3损坏 4丢弃 5待审核
     private Integer status;
+
+    //是否逾期 0逾期，1未逾期
+    private Integer isOutTime;
 
     @TableField(exist = false)
     private Integer borrowCount;

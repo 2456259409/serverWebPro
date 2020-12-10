@@ -10,6 +10,7 @@ import com.renjian.model.Book;
 import com.renjian.model.BorrowBook;
 import com.renjian.model.ClientUser;
 import com.renjian.model.User;
+import com.renjian.model.params.BorrowBookParam;
 import com.renjian.model.params.SubmitPaper;
 import com.renjian.service.BookService;
 import com.renjian.service.BorrowBookService;
@@ -180,5 +181,33 @@ public class BookController {
             return new CommonResult().success(0);
         }
         return new CommonResult().success(1);
+    }
+
+    @GetMapping("/get_borrow_books")
+    public Object getMyBorrowBooks(BorrowBookParam borrowBookParam){
+
+        QueryWrapper<BorrowBook> wrapper=new QueryWrapper<>();
+        if(borrowBookParam.getKey()==1){
+            wrapper.eq("status",5);
+        }else if(borrowBookParam.getKey()==2){
+            wrapper.eq("status",1);
+        }
+        wrapper.eq("user_id",borrowBookParam.getUserId());
+        wrapper.last(RUtil.limitStr(borrowBookParam.getPageSize(),borrowBookParam.getPageNum()));
+        List<BorrowBook> list = borrowBookService.list(wrapper);
+        return new CommonResult().success(list);
+    }
+
+    @PostMapping("/back_book")
+    public void backBook(@RequestBody BorrowBookParam borrowBookParam){
+        UpdateWrapper<BorrowBook> wrapper=new UpdateWrapper<>();
+        wrapper.eq("id",borrowBookParam.getBorrowId());
+        if(borrowBookParam.getIsOutTime()==1){
+            wrapper.set("is_out_time",1);
+        }else{
+            wrapper.set("is_out_time",0);
+        }
+        wrapper.set("status",5);
+        borrowBookService.update(wrapper);
     }
 }
