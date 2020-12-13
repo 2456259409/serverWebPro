@@ -130,4 +130,11 @@ public class PaperController {
         answerService.saveOrUpdateBatch(submit);
         return new CommonResult().success();
     }
+
+
+    @GetMapping("/get_fill_result/{paperId}/{userId}")
+    public Object getFillResult(@PathVariable Long paperId,@PathVariable Long userId){
+        List<SubmitPaper> list = answerService.list(new QueryWrapper<SubmitPaper>().eq("paper_id", paperId).eq("user_id", userId));
+        return new CommonResult().success(list);
+    }
 }

@@ -4,9 +4,17 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.renjian.mapper.BookMapper;
 import com.renjian.model.Book;
+import com.renjian.model.BorrowBook;
+import com.renjian.model.ClientUser;
+import com.renjian.model.User;
+import com.renjian.model.params.BorrowBookParam;
+import com.renjian.model.params.SubmitPaper;
 import com.renjian.service.BookService;
+import com.renjian.service.BorrowBookService;
+import com.renjian.service.ClientUserService;
 import com.renjian.service.UserService;
 import com.renjian.utils.CommonResult;
 import com.renjian.utils.RUtil;
@@ -29,6 +37,12 @@ public class BookController {
 
     @Resource
     UserService userService;
+
+    @Resource
+    BorrowBookService borrowBookService;
+
+    @Resource
+    ClientUserService clientUserService;
 
     @GetMapping("/get_all")
     public Object getAllBook(){
@@ -142,5 +156,58 @@ public class BookController {
         }else{
             return new CommonResult().failed("审核失败");
         }
+    }
+
+    @PostMapping("/borrow_book")
+    public Object borrowOneBook(@RequestBody BorrowBook borrowBook){
+        BorrowBook book=new BorrowBook();
+        book.setBookId(borrowBook.getBookId());
+        book.setUserId(borrowBook.getUserId());
+        book.setStatus(0);
+        BorrowBook one = borrowBookService.getOne(new QueryWrapper<>(book));
+        if(one!=null){
+            return new CommonResult().failed("借阅失败");
+        }
+        borrowBookService.save(borrowBook);
+//        userService.update(new QueryWrapper<ClientUser>())
+        clientUserService.update(new UpdateWrapper<ClientUser>().eq("id",borrowBook.getUserId()).set(borrowBook.getBorrowCount()!=null,"borrow_count",borrowBook.getBorrowCount()));
+        return new CommonResult().success("借阅成功");
+    }
+
+    @GetMapping("/check_book")
+    public Object checkBookInBorrow(BorrowBook borrowBook){
+        BorrowBook borrow = borrowBookService.getOne(new QueryWrapper<>(borrowBook));
+        if(borrow==null){
+            return new CommonResult().success(0);
+        }
+        return new CommonResult().success(1);
+    }
+
+    @GetMapping("/get_borrow_books")
+    public Object getMyBorrowBooks(BorrowBookParam borrowBookParam){
+
+        QueryWrapper<BorrowBook> wrapper=new QueryWrapper<>();
+        if(borrowBookParam.getKey()==1){
+            wrapper.eq("status",5);
+        }else if(borrowBookParam.getKey()==2){
+            wrapper.eq("status",1);
+        }
+        wrapper.eq("user_id",borrowBookParam.getUserId());
+        wrapper.last(RUtil.limitStr(borrowBookParam.getPageSize(),borrowBookParam.getPageNum()));
+        List<BorrowBook> list = borrowBookService.list(wrapper);
+        return new CommonResult().success(list);
+    }
+
+    @PostMapping("/back_book")
+    public void backBook(@RequestBody BorrowBookParam borrowBookParam){
+        UpdateWrapper<BorrowBook> wrapper=new UpdateWrapper<>();
+        wrapper.eq("id",borrowBookParam.getBorrowId());
+        if(borrowBookParam.getIsOutTime()==1){
+            wrapper.set("is_out_time",1);
+        }else{
+            wrapper.set("is_out_time",0);
+        }
+        wrapper.set("status",5);
+        borrowBookService.update(wrapper);
     }
 }
