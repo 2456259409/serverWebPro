@@ -29,6 +29,9 @@ public class MyInterceptor implements HandlerInterceptor {
                         Long userId=Long.valueOf(params[0]);
                         String salt=params[1];
                         User user = userService.getById(userId);
+                        if(user.getStatus()==0){
+                            return false;
+                        }
                         if(salt.equals(user.getSalt())){
                             return true;
                         }else{

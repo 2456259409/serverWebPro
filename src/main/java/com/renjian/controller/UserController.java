@@ -3,15 +3,19 @@ package com.renjian.controller;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.renjian.model.KeyWord;
 import com.renjian.model.User;
 import com.renjian.service.UserService;
 import com.renjian.utils.CommonResult;
+import com.renjian.utils.RUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import javax.websocket.server.PathParam;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -82,5 +86,47 @@ public class UserController {
         url=url.replace("pageSize",String.valueOf(keyWord.getPageSize())).replace("pageNum",String.valueOf(keyWord.getPageNum())).replace("keyword",keyWord.getKeyword());
         String result=restTemplate.getForObject(url,String.class);
         return new CommonResult().success(result);
+    }
+
+    @PostMapping("/get_users")
+    public Object getUsers(KeyWord keyWord){
+        if(keyWord.getUserId()!=10){
+            return new CommonResult().failed("您没有操作权限");
+        }
+        Integer word=Integer.valueOf(keyWord.getKeyword());
+        QueryWrapper<User> wrapper=new QueryWrapper<>();
+        wrapper.orderByDesc("id").last(RUtil.limitStr(keyWord.getPageSize(), keyWord.getPageNum()));
+        if(word==2){
+            wrapper.eq("status",0);
+        }else if(word==3){
+            wrapper.eq("status",1);
+        }
+
+        List<User> list = userService.list(wrapper);
+        list.forEach(item->{
+            item.setPassword("");
+            item.setSalt("");
+        });
+        return new CommonResult().success(list);
+    }
+
+    @PostMapping("/disable_user")
+    public Object disableUser(KeyWord keyWord){
+
+        if(keyWord.getMasterUserId()!=10){
+            return new CommonResult().failed("没有操作权限");
+        }
+        userService.update(new UpdateWrapper<User>().eq("id",keyWord.getUserId()).set("status",0));
+        return new CommonResult().success("禁用成功");
+    }
+
+    @PostMapping("/able_user")
+    public Object ableUser(KeyWord keyWord){
+
+        if(keyWord.getMasterUserId()!=10){
+            return new CommonResult().failed("没有操作权限");
+        }
+        userService.update(new UpdateWrapper<User>().eq("id",keyWord.getUserId()).set("status",1));
+        return new CommonResult().success("解禁成功");
     }
 }

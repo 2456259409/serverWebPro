@@ -28,6 +28,8 @@ public class ClientUser {
 
     private Integer borrowCount;
 
+    private Integer status;
+
 //    private String MD5Password(){
 //        SecureUtil.des();
 //        return

@@ -3,12 +3,17 @@ package com.renjian.controller;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.renjian.model.ClientUser;
+import com.renjian.model.KeyWord;
+import com.renjian.model.User;
 import com.renjian.service.ClientUserService;
 import com.renjian.utils.CommonResult;
+import com.renjian.utils.RUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/client_user")
@@ -49,6 +54,48 @@ public class ClientUserController {
         }else{
             return new CommonResult().failed("注册失败");
         }
+    }
+
+    @PostMapping("/get_users")
+    public Object getUsers(KeyWord keyWord){
+        if(keyWord.getUserId()!=10){
+            return new CommonResult().failed("您没有操作权限");
+        }
+        Integer word=Integer.valueOf(keyWord.getKeyword());
+        QueryWrapper<ClientUser> wrapper=new QueryWrapper<>();
+        wrapper.orderByDesc("id").last(RUtil.limitStr(keyWord.getPageSize(), keyWord.getPageNum()));
+        if(word==2){
+            wrapper.eq("status",0);
+        }else if(word==3){
+            wrapper.eq("status",1);
+        }
+
+        List<ClientUser> list = clientUserService.list(wrapper);
+        list.forEach(item->{
+            item.setPassword("");
+            item.setSalt("");
+        });
+        return new CommonResult().success(list);
+    }
+
+    @PostMapping("/disable_user")
+    public Object disableUser(KeyWord keyWord){
+
+        if(keyWord.getMasterUserId()!=10){
+            return new CommonResult().failed("没有操作权限");
+        }
+        clientUserService.update(new UpdateWrapper<ClientUser>().eq("id",keyWord.getUserId()).set("status",0));
+        return new CommonResult().success("禁用成功");
+    }
+
+    @PostMapping("/able_user")
+    public Object ableUser(KeyWord keyWord){
+
+        if(keyWord.getMasterUserId()!=10){
+            return new CommonResult().failed("没有操作权限");
+        }
+        clientUserService.update(new UpdateWrapper<ClientUser>().eq("id",keyWord.getUserId()).set("status",1));
+        return new CommonResult().success("解禁成功");
     }
 
 

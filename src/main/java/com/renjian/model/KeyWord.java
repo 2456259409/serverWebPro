@@ -7,4 +7,6 @@ public class KeyWord {
     private String keyword;
     private Integer pageSize=10;
     private Integer pageNum=1;
+    private Long userId;
+    private Long masterUserId;
 }

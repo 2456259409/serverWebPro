@@ -21,4 +21,7 @@ public class User implements Serializable {
     private String salt;
     @TableField(exist = false)
     private String keyword;
+
+    //0表示禁用，1表示正常使用
+    private Integer status;
 }
