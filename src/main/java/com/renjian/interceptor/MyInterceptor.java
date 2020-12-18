@@ -1,8 +1,10 @@
 package com.renjian.interceptor;
 
 
+import cn.hutool.json.JSONUtil;
 import com.renjian.model.User;
 import com.renjian.service.UserService;
+import com.renjian.utils.CommonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.Nullable;
@@ -11,6 +13,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class MyInterceptor implements HandlerInterceptor {
     @Autowired
@@ -30,6 +34,7 @@ public class MyInterceptor implements HandlerInterceptor {
                         String salt=params[1];
                         User user = userService.getById(userId);
                         if(user.getStatus()==0){
+                            responseStr(response,"您没有操作权限",200);
                             return false;
                         }
                         if(salt.equals(user.getSalt())){
@@ -63,6 +68,16 @@ public class MyInterceptor implements HandlerInterceptor {
 
         }
 
+    }
+
+
+    public void responseStr(HttpServletResponse response,String content,int code) throws IOException {
+        response.setStatus(code);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        PrintWriter writer = response.getWriter();
+        writer.print(JSONUtil.toJsonStr(new CommonResult().failed(content)));
+        writer.close();
     }
 
     @Override
