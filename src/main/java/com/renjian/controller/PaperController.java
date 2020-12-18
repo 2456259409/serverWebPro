@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -132,9 +133,12 @@ public class PaperController {
     }
 
 
-    @GetMapping("/get_fill_result/{paperId}/{userId}")
-    public Object getFillResult(@PathVariable Long paperId,@PathVariable Long userId){
-        List<SubmitPaper> list = answerService.list(new QueryWrapper<SubmitPaper>().eq("paper_id", paperId).eq("user_id", userId));
-        return new CommonResult().success(list);
+    @PostMapping("/get_fill_result")
+    public Object getFillResult(SubmitPaper paper){
+        List<Map<String, Object>> maps = answerService.listMaps(new QueryWrapper<SubmitPaper>()
+                .eq(paper.getPaperId() == null, "paper_id", paper.getPaperId())
+                .eq(paper.getUserId() == null, "user_id", paper.getUserId())
+                .groupBy("question_id"));
+        return new CommonResult().success(maps);
     }
 }
