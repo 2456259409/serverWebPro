@@ -8,6 +8,7 @@ import com.renjian.model.KeyWord;
 import com.renjian.model.User;
 import com.renjian.service.UserService;
 import com.renjian.utils.CommonResult;
+import com.renjian.utils.RExecutorUtil;
 import com.renjian.utils.RUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import javax.annotation.Resource;
 import javax.websocket.server.PathParam;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/user")
@@ -41,8 +43,10 @@ public class UserController {
             return new CommonResult().failed("登录失败，请检查用户名和密码");
         }
         if(u.getPassword().equals(SecureUtil.md5(resoleSalt.replace("T",u.getSalt()+user.getPassword())))){
+            CompletableFuture.runAsync(()->{
+                userService.update(new UpdateWrapper<User>().eq("id",u.getId()).set("login_time",new Date()));
+            }, RExecutorUtil.getExecutor());
             u.setLoginTime(new Date());
-            userService.update(new UpdateWrapper<User>().eq("id",u.getId()).set("login_time",new Date()));
             u.setPassword("");
             return new CommonResult().success(u);
         }
