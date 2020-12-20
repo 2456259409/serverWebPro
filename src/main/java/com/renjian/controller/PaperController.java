@@ -135,10 +135,12 @@ public class PaperController {
 
     @PostMapping("/get_fill_result")
     public Object getFillResult(SubmitPaper paper){
-        List<Map<String, Object>> maps = answerService.listMaps(new QueryWrapper<SubmitPaper>()
-                .eq(paper.getPaperId() == null, "paper_id", paper.getPaperId())
-                .eq(paper.getUserId() == null, "user_id", paper.getUserId())
-                .groupBy("question_id"));
-        return new CommonResult().success(maps);
+        List<SubmitPaper> list = answerService.list(new QueryWrapper<SubmitPaper>()
+                .select("paper_id","question_id","count(*) as count")
+                .eq(paper.getPaperId() != null, "paper_id", paper.getPaperId())
+                .in("question_id",paper.getQuestionIds())
+                .groupBy("question_id")
+        );
+        return new CommonResult().success(list);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import javax.websocket.server.PathParam;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -40,6 +41,8 @@ public class UserController {
             return new CommonResult().failed("登录失败，请检查用户名和密码");
         }
         if(u.getPassword().equals(SecureUtil.md5(resoleSalt.replace("T",u.getSalt()+user.getPassword())))){
+            u.setLoginTime(new Date());
+            userService.update(new UpdateWrapper<User>().eq("id",u.getId()).set("login_time",new Date()));
             u.setPassword("");
             return new CommonResult().success(u);
         }

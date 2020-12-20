@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @TableName("rj_user")
@@ -24,4 +25,6 @@ public class User implements Serializable {
 
     //0表示禁用，1表示正常使用
     private Integer status;
+
+    private Date loginTime;
 }

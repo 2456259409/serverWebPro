@@ -7,6 +7,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @TableName("rj_answer")
 public class SubmitPaper {
@@ -25,6 +28,11 @@ public class SubmitPaper {
 
     private String codesJson;
     private String content;
+    @TableField(exist = false)
+    private Integer count;
+
+    @TableField(exist = false)
+    private List<Long> questionIds=new ArrayList<>();
 
     public void toCodesJson(){
         codesJson= JSONUtil.toJsonStr(codes);
