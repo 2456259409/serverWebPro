@@ -103,6 +103,25 @@ public class PaperController {
         return  new CommonResult().failed("删除失败");
     }
 
+    @PostMapping("/updatePaper")
+    public Object updatePaper(@RequestBody JSONObject jsonObject){
+        Paper paper=JSONUtil.toBean(jsonObject,Paper.class);
+        try{
+            paperService.updateById(paper);
+            int i=1;
+            for(Question question:paper.getQuestion()){
+                question.setSortInPaper(i++);
+                question.setAllAnswer(JSONUtil.toJsonStr(question.getAnswer()));
+            }
+            questionService.saveOrUpdateBatch(paper.getQuestion());
+//            questionService.updateBatchById(paper.getQuestion());
+            return new CommonResult().success("修改成功");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return new CommonResult().failed("修改失败");
+    }
 
 
     @PostMapping("/submit_paper")
