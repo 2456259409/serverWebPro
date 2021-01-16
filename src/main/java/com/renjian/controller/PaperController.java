@@ -38,32 +38,7 @@ public class PaperController {
     private AnswerService answerService;
 
 
-    @PostMapping("/addPaper")
-    public Object addPaper(@RequestBody JSONObject jsonObject){
-        Paper paper = jsonObject.toBean(Paper.class);
-        paper.setCreateTime(new Date());
-        paper.setStatus(2);
-        paperService.save(paper);
-        int i=1;
-        for (Question question:paper.getQuestion()){
-            question.setSortInPaper(i++);
-            question.setPaperId(paper.getId());
-            question.answerToString();
-        }
-        if(paper.getQuestion().size()>0){
-            questionService.saveBatch(paper.getQuestion());
-        }
-        return new CommonResult().success("提交成功");
-    }
 
-    @GetMapping("/get_paper_byId/{userId}")
-    public Object getPaperByUserId(@PathVariable Long userId){
-        QueryWrapper<Paper> wrapper=new QueryWrapper<>();
-        wrapper.eq("user_id",userId);
-        wrapper.in("status",1,2);
-        List<Paper> papers = paperService.list(wrapper);
-        return new CommonResult().success(papers);
-    }
 
     @GetMapping("/get_papers")
     public Object getPapers(int pageSize,int pageNum,String keyword){
@@ -103,25 +78,7 @@ public class PaperController {
         return  new CommonResult().failed("删除失败");
     }
 
-    @PostMapping("/updatePaper")
-    public Object updatePaper(@RequestBody JSONObject jsonObject){
-        Paper paper=JSONUtil.toBean(jsonObject,Paper.class);
-        try{
-            paperService.updateById(paper);
-            int i=1;
-            for(Question question:paper.getQuestion()){
-                question.setSortInPaper(i++);
-                question.setAllAnswer(JSONUtil.toJsonStr(question.getAnswer()));
-            }
-            questionService.saveOrUpdateBatch(paper.getQuestion());
-//            questionService.updateBatchById(paper.getQuestion());
-            return new CommonResult().success("修改成功");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
 
-        return new CommonResult().failed("修改失败");
-    }
 
     @PostMapping("/submit_paper")
     public Object submitPaper(@RequestBody List<SubmitPaper> submit){
