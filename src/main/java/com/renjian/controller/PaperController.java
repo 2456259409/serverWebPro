@@ -37,7 +37,32 @@ public class PaperController {
     @Resource
     private AnswerService answerService;
 
+    @PostMapping("/addPaper")
+    public Object addPaper(@RequestBody JSONObject jsonObject){
+        Paper paper = jsonObject.toBean(Paper.class);
+        paper.setCreateTime(new Date());
+        paper.setStatus(2);
+        paperService.save(paper);
+        int i=1;
+        for (Question question:paper.getQuestion()){
+            question.setSortInPaper(i++);
+            question.setPaperId(paper.getId());
+            question.answerToString();
+        }
+        if(paper.getQuestion().size()>0){
+            questionService.saveBatch(paper.getQuestion());
+        }
+        return new CommonResult().success("提交成功");
+    }
 
+    @GetMapping("/get_paper_byId/{userId}")
+    public Object getPaperByUserId(@PathVariable Long userId){
+        QueryWrapper<Paper> wrapper=new QueryWrapper<>();
+        wrapper.eq("user_id",userId);
+        wrapper.in("status",1,2);
+        List<Paper> papers = paperService.list(wrapper);
+        return new CommonResult().success(papers);
+    }
 
 
     @GetMapping("/get_papers")
