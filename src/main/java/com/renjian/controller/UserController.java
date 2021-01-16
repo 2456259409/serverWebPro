@@ -33,7 +33,42 @@ public class UserController {
 
     private String resoleSalt="|-T-|";
 
-    
+    @PostMapping("/login")
+    public Object login(User user){
+        QueryWrapper<User> wrapper=new QueryWrapper<>();
+        wrapper.eq(user.getUsername()!=null,"username",user.getUsername());
+//        wrapper.eq(user.getPassword()!=null,"password",SecureUtil.md5(resoleSalt.replace("T",user.getPassword())));
+        User u = userService.getOne(wrapper);
+        if(u==null){
+            return new CommonResult().failed("登录失败，请检查用户名和密码");
+        }
+        if(u.getPassword().equals(SecureUtil.md5(resoleSalt.replace("T",u.getSalt()+user.getPassword())))){
+            CompletableFuture.runAsync(()->{
+                userService.update(new UpdateWrapper<User>().eq("id",u.getId()).set("login_time",new Date()));
+            }, RExecutorUtil.getExecutor());
+            u.setLoginTime(new Date());
+            u.setPassword("");
+            return new CommonResult().success(u);
+        }
+        return new CommonResult().failed("登录失败，请检查用户名和密码");
+    }
+
+    @PostMapping("/register")
+    public Object register(User user){
+        QueryWrapper<User> wrapper=new QueryWrapper<>();
+        wrapper.eq(user.getUsername()!=null,"username",user.getUsername());
+        User u = userService.getOne(wrapper);
+        if(u==null){
+            String salt = RandomUtil.randomString(15);
+            user.setSalt(salt);
+            String s=resoleSalt.replace("T",salt+user.getPassword());
+            String pass = SecureUtil.md5(s);
+            user.setPassword(pass);
+            userService.saveOrUpdate(user);
+            return new CommonResult().success("注册成功");
+        }
+        return new CommonResult().failed("用户名已经存在");
+    }
 
     @PostMapping("/updateUser")
     public Object updateUser(User user){
